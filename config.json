@@ -1,6 +1,9 @@
 {
     "title":"遇见你",
     "subTitle":"迟暮终有时,留芳从开颜",
-    "avatarUrl":"https://github.githubassets.com/favicons/favicon.svg",
-    "GMEEK_VERSION":"last"
+    "avatarUrl":"https://github.com/fengqingxiao.png",
+    "GMEEK_VERSION":"last",
+    "singlePage":["索引"],
+    "bottomText":"遇见你 · 只写记得住的部分",
+    "style":"<style>body{max-width:780px;font-size:17px;line-height:1.9;} #postBody p{margin-bottom:1.1em;} #postBody img{max-width:100%;border-radius:6px;} #postBody blockquote{border-left:3px solid var(--color-border-default);padding-left:1em;color:var(--color-fg-muted);} .postTitle{letter-spacing:0.02em;}</style>"
 }
