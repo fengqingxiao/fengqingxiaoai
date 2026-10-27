@@ -55,6 +55,9 @@ jobs:
           cp -a /opt/Gmeek/backup ${{ github.workspace }} 
           cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
           
+      - name: Build wiki index
+        run: python wiki/build_wiki.py
+
       - name: update html
         run: |
           git config --local user.email "$(jq -r ".email" config.json)"
