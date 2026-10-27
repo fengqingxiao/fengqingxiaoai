@@ -844,6 +844,16 @@ h1.postTitle {
     .md-body { font-size: 16.5px !important; }
 }
 
+body.anim-done .hero-eyebrow,
+body.anim-done .hero h1,
+body.anim-done .hero .hero-range,
+body.anim-done .hero p.hero-desc,
+body.anim-done .hero-actions {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .card, .hero-eyebrow, .hero h1, .hero .hero-range, .hero p.hero-desc, .hero-actions {
