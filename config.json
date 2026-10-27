@@ -3,8 +3,10 @@
     "subTitle":"迟暮终有时,留芳从开颜",
     "avatarUrl":"https://github.com/fengqingxiao.png",
     "GMEEK_VERSION":"last",
+    "themeMode":"fix",
     "singlePage":["索引"],
     "iconList":{"索引":"M5.75 2.5h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1 0-1.5Zm0 5h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1 0-1.5Zm0 5h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1 0-1.5ZM2 14a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-6a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM2 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"},
     "bottomText":"遇见你 · 只写记得住的部分",
-    "style":"<style>body{max-width:780px;font-size:17px;line-height:1.9;} #postBody p{margin-bottom:1.1em;} #postBody img{max-width:100%;border-radius:6px;} #postBody blockquote{border-left:3px solid var(--color-border-default);padding-left:1em;color:var(--color-fg-muted);} .postTitle{letter-spacing:0.02em;}</style>"
+    "allHead":"<link rel=\"stylesheet\" href=\"/fengqingxiaoai/wiki.css\"><script src=\"/fengqingxiaoai/wiki-common.js\" defer></script>",
+    "indexScript":"<script src=\"/fengqingxiaoai/wiki-index.js\" defer></script>"
 }
