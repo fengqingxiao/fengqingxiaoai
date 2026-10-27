@@ -154,7 +154,10 @@
         var dexSort = document.getElementById("dexSort");
         var dexMeta = document.getElementById("dexMeta");
         var dexEmpty = document.getElementById("dexEmpty");
+        var moreBtn = document.getElementById("dexMore");
+        if (moreBtn) moreBtn.addEventListener("click", function () { limit += LIMIT; apply(); });
         var state = { q: "", type: "", gen: "", sort: "id" };
+        var LIMIT = 60, limit = LIMIT;
 
         function num(card, key) {
             return parseFloat(card.getAttribute("data-" + key) || "0") || 0;
@@ -173,6 +176,14 @@
                 if (ok) shown++;
             });
 
+            var shownCards = cards.filter(function (c) { return !c.hidden; });
+            if (moreBtn) {
+                var rest = Math.max(0, shownCards.length - limit);
+                moreBtn.hidden = rest === 0;
+                moreBtn.textContent = "显示更多（剩余 " + rest + "）";
+            }
+            shownCards.forEach(function (c, i) { c.hidden = i >= limit; });
+
             var sorted = cards.slice().sort(function (a, b) {
                 if (state.sort === "name") return (a.getAttribute("data-name") || "").localeCompare(b.getAttribute("data-name") || "", "zh-Hans-CN");
                 if (state.sort === "id") return num(a, "id") - num(b, "id");
@@ -180,7 +191,10 @@
             });
             sorted.forEach(function (c) { dexGrid.appendChild(c); });
 
-            if (dexMeta) dexMeta.textContent = "显示 " + shown + " / " + cards.length + " 条";
+            if (dexMeta) {
+                var shownNow = Math.min(shown, limit);
+                dexMeta.textContent = "匹配 " + shown + " 条 · 已显示 " + shownNow + " 条";
+            }
             if (dexEmpty) dexEmpty.hidden = shown > 0;
         }
 
@@ -193,6 +207,7 @@
         if (dexSort) {
             dexSort.addEventListener("change", function () {
                 state.sort = dexSort.value;
+                limit = LIMIT;
                 apply();
             });
         }
@@ -210,6 +225,7 @@
                 filters.querySelectorAll('[data-' + group + "]").forEach(function (b) {
                     b.classList.toggle("is-active", !same && b.getAttribute("data-" + group) === val);
                 });
+                limit = LIMIT;
                 apply();
             });
         }
@@ -218,7 +234,7 @@
     }
 
     /* ---------------- 道具类别筛选 ---------------- */
-    var itemList = document.getElementById("itemList");
+    var itemList = document.getElementById("itemsTable");
     if (itemList) {
         document.querySelectorAll('.fchip[data-cat]').forEach(function (btn) {
             btn.addEventListener("click", function () {
@@ -227,15 +243,40 @@
                 document.querySelectorAll('.fchip[data-cat]').forEach(function (b) { b.classList.remove("is-active"); });
                 if (!same && cat) btn.classList.add("is-active");
 
-                var shown = 0;
-                itemList.querySelectorAll(".mini-card").forEach(function (card) {
-                    var ok = same || !cat || card.getAttribute("data-cat") === cat;
-                    card.hidden = !ok;
-                    if (ok) shown++;
+                itemList.querySelectorAll("tbody tr[data-cat]").forEach(function (row) {
+                    row.hidden = !(same || !cat || row.getAttribute("data-cat") === cat);
                 });
             });
         });
     }
+
+    /* ---------------- 大表格分批展示 ---------------- */
+    document.querySelectorAll(".load-more[data-table]").forEach(function (btn) {
+        var table = document.getElementById(btn.getAttribute("data-table"));
+        if (!table) return;
+        var tbody = table.querySelector("tbody");
+        var rows = Array.prototype.slice.call(tbody.querySelectorAll("tr"));
+        var STEP = 80;
+        var shown = STEP;
+
+        function refresh() {
+            var visible = rows.filter(function (r) { return r.getAttribute("data-hidden-before") !== "1"; });
+            visible.forEach(function (r, i) { r.hidden = i >= shown; });
+            var rest = Math.max(0, visible.length - shown);
+            btn.hidden = rest === 0;
+            btn.textContent = "显示更多（剩余 " + rest + "）";
+        }
+
+        btn.addEventListener("click", function () {
+            shown += STEP;
+            refresh();
+        });
+
+        // 供文字筛选复用：筛选后重新分批
+        window.__refreshChunks = window.__refreshChunks || [];
+        window.__refreshChunks.push(refresh);
+        refresh();
+    });
 
     /* ---------------- 通用文字筛选 ---------------- */
     document.querySelectorAll(".table-filter, .card-filter").forEach(function (input) {
@@ -245,8 +286,11 @@
             var q = input.value.trim().toLowerCase();
             var nodes = target.querySelectorAll("tbody tr, .mini-card");
             nodes.forEach(function (node) {
-                node.hidden = q !== "" && node.textContent.toLowerCase().indexOf(q) < 0;
+                var hit = q === "" || node.textContent.toLowerCase().indexOf(q) >= 0;
+                node.setAttribute("data-hidden-before", hit ? "0" : "1");
+                node.hidden = !hit;
             });
+            (window.__refreshChunks || []).forEach(function (fn) { fn(); });
         });
     });
 })();

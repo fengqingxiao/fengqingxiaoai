@@ -248,7 +248,7 @@ def render_pokedex(data):
     cards = "".join(
         """<a class="dex-card" href="pokemon/%(id)s.html" data-id="%(id)s" data-no="#%(id)s" data-name="%(name)s" data-en="%(en)s" data-types="%(types_attr)s" data-gen="%(gen)s" data-hp="%(hp)s" data-atk="%(atk)s" data-spe="%(spe)s" style="--tc:%(color)s">
   <span class="dex-no">#%(id)s</span>
-  <span class="dex-art"></span>
+  <span class="dex-art">%(img)s</span>
   <span class="dex-name">%(name)s</span>
   <span class="dex-sub">%(en)s</span>
   <span class="dex-types">%(chips)s</span>
@@ -261,6 +261,7 @@ def render_pokedex(data):
             "hp": p.get("stats", {}).get("hp", 0),
             "atk": p.get("stats", {}).get("atk", 0),
             "spe": p.get("stats", {}).get("spe", 0),
+            "img": ('<img src="assets/%s" loading="lazy" alt="%s">' % (p["sprite"], p["name"])) if p.get("sprite") else "",
         }
         for p in pokemon
     ) or '<p class="muted">暂无数据。</p>'
@@ -279,7 +280,7 @@ def render_pokedex(data):
 <section class="page-head">
   <p class="eyebrow">POKÉDEX</p>
   <h1>宝可梦图鉴</h1>
-  <p class="lede">共 %(count)d 条记录。按属性、世代筛选，或直接搜索名称。</p>
+  <p class="lede">收录 %(count)d 只宝可梦。按属性、世代筛选，或直接搜索名称。</p>
 </section>
 
 <div class="toolbar">
@@ -307,6 +308,7 @@ def render_pokedex(data):
 <p class="result-meta" id="dexMeta"></p>
 <div class="dex-grid" id="dexGrid">%(cards)s</div>
 <p class="empty" id="dexEmpty" hidden>没有符合条件的宝可梦。</p>
+<div class="load-more-wrap"><button class="load-more" id="dexMore" hidden>显示更多</button></div>
 """ % {
         "count": len(pokemon), "type_filters": type_filters,
         "gen_filters": gen_filters, "cards": cards,
@@ -335,14 +337,28 @@ def render_pokemon(p, data, prev_p, next_p):
 
     evo = ""
     if p.get("evolution"):
+        chain = p["evolution"]
         parts = []
-        for i, step in enumerate(p["evolution"]):
+        for i, step in enumerate(chain):
             parts.append('<span class="evo-node"><b>%s</b></span>' % esc(step.get("name", "")))
-            if i < len(p["evolution"]) - 1:
-                parts.append('<span class="evo-arrow">%s</span>' % esc(step.get("method", "→")))
+            if i < len(chain) - 1:
+                label = chain[i + 1].get("method") or "→"
+                parts.append('<span class="evo-arrow">%s</span>' % esc(label))
         evo = '<section class="panel"><h2>进化链</h2><div class="evo">%s</div></section>' % "".join(parts)
 
-    dex_text = ('<section class="panel"><h2>图鉴说明</h2><p class="dex-text">%s</p></section>' % esc(p["dex"])) if p.get("dex") else ""
+    dex_para = p.get("dex") or ""
+    if not dex_para:
+        bits = []
+        if p.get("category"):
+            bits.append("分类为「%s」" % p["category"])
+        if p.get("types"):
+            bits.append("属性为%s" % "／".join(p["types"]))
+        if p.get("generation"):
+            bits.append("第 %d 世代登场" % p["generation"])
+        if p.get("abilities"):
+            bits.append("特性为%s" % "、".join(p["abilities"]))
+        dex_para = "，".join(bits) + "。"
+    dex_text = '<section class="panel"><h2>图鉴说明</h2><p class="dex-text">%s</p></section>' % esc(dex_para)
     trivia = ""
     if p.get("trivia"):
         trivia = '<section class="panel"><h2>补充</h2><ul class="bullets">%s</ul></section>' % "".join(
@@ -363,7 +379,7 @@ def render_pokemon(p, data, prev_p, next_p):
     <p class="entry-en">%s</p>
     <div class="entry-types">%s</div>
   </div>
-  <div class="entry-art" style="--tc:%s"><span></span></div>
+  <div class="entry-art" style="--tc:%s">%s</div>
 </section>
 
 <div class="entry-grid">
@@ -394,6 +410,7 @@ def render_pokemon(p, data, prev_p, next_p):
         esc(p["name"]), type_color(types, p["types"][0]), esc(p["id"]), esc(p["name"]), esc(p.get("en", "")),
         "".join(type_chip(t, types) for t in p.get("types", [])),
         type_color(types, p["types"][0]),
+        ('<img src="../assets/%s" alt="%s">' % (p["sprite"], p["name"])) if p.get("sprite") else "",
         info_row("分类", esc(p.get("category", ""))),
         info_row("特性", abilities),
         info_row("身高", ("%s m" % p["height"]) if p.get("height") else ""),
@@ -445,22 +462,21 @@ def render_moves(data):
   <tbody>%s</tbody>
 </table>
 </div>
+<div class="load-more-wrap"><button class="load-more" data-table="movesTable" hidden>显示更多</button></div>
 """ % (len(data["moves"]), rows)
     return page("招式", body, "moves", desc="宝可梦招式数据")
 
 
 def render_abilities(data):
-    cards = "".join(
-        """<article class="mini-card" id="a-%(name)s">
-  <h3>%(name)s <i>%(en)s</i></h3>
-  <p>%(effect)s</p>
-  <div class="mini-meta">第 %(gen)s 世代</div>
-</article>""" % {
-            "name": esc(a["name"]), "en": esc(a.get("en", "")),
-            "effect": esc(a.get("effect", "")), "gen": esc(a.get("generation", "—")),
+    rows = "".join(
+        """<tr>
+  <td class="col-name"><a href="#a-%(name)s">%(name)s</a><i>%(en)s</i></td>
+  <td class="dim">第 %(gen)s 世代</td>
+</tr>""" % {
+            "name": esc(a["name"]), "en": esc(a.get("en", "")), "gen": esc(a.get("generation", "—")),
         }
         for a in data["abilities"]
-    ) or '<p class="muted">暂无数据。</p>'
+    ) or '<tr><td colspan="2" class="muted">暂无数据。</td></tr>'
 
     body = """
 <section class="page-head">
@@ -470,27 +486,32 @@ def render_abilities(data):
 </section>
 <div class="toolbar">
   <div class="field"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M10.68 11.74l3.29 3.29-.71.71-3.29-3.29a5.5 5.5 0 1 1 .71-.71ZM6.5 11a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z"/></svg>
-  <input class="card-filter" data-target="abilityList" type="search" placeholder="搜索特性"></div>
+  <input class="table-filter" data-target="abilitiesTable" type="search" placeholder="搜索特性名"></div>
 </div>
-<div class="mini-grid" id="abilityList">%s</div>
-""" % (len(data["abilities"]), cards)
+<div class="table-wrap">
+<table class="data-table" id="abilitiesTable">
+  <thead><tr><th>特性</th><th>登场</th></tr></thead>
+  <tbody>%s</tbody>
+</table>
+</div>
+""" % (len(data["abilities"]), rows)
     return page("特性", body, "abilities", desc="宝可梦特性数据")
 
 
 def render_items(data):
     cats = sorted({i.get("category", "其他") for i in data["items"]})
-    cards = "".join(
-        """<article class="mini-card" data-cat="%(cat)s">
-  <span class="mini-tag">%(cat)s</span>
-  <h3>%(name)s <i>%(en)s</i></h3>
-  <p>%(effect)s</p>
-  <div class="mini-meta">%(where)s</div>
-</article>""" % {
+    rows = "".join(
+        """<tr data-cat="%(cat)s">
+  <td class="col-name">%(name)s<i>%(en)s</i></td>
+  <td><span class="tag tag-cat">%(cat)s</span></td>
+  <td class="num">%(cost)s</td>
+  <td class="dim">第 %(gen)s 世代</td>
+</tr>""" % {
             "cat": esc(i.get("category", "其他")), "name": esc(i["name"]), "en": esc(i.get("en", "")),
-            "effect": esc(i.get("effect", "")), "where": esc(i.get("where", "")),
+            "cost": esc(i.get("cost", 0)), "gen": esc(i.get("generation", "—")),
         }
         for i in data["items"]
-    ) or '<p class="muted">暂无数据。</p>'
+    ) or '<tr><td colspan="4" class="muted">暂无数据。</td></tr>'
 
     chips = "".join('<button class="fchip" data-cat="%s">%s</button>' % (esc(c), esc(c)) for c in cats)
 
@@ -498,11 +519,21 @@ def render_items(data):
 <section class="page-head">
   <p class="eyebrow">ITEMS</p>
   <h1>道具资料</h1>
-  <p class="lede">共 %d 件道具，按类别浏览。</p>
+  <p class="lede">共 %d 件道具，可按类别筛选或按名称搜索。</p>
 </section>
+<div class="toolbar">
+  <div class="field"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M10.68 11.74l3.29 3.29-.71.71-3.29-3.29a5.5 5.5 0 1 1 .71-.71ZM6.5 11a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z"/></svg>
+  <input class="table-filter" data-target="itemsTable" type="search" placeholder="搜索道具名"></div>
+</div>
 <div class="filters"><div class="frow"><span class="flabel">类别</span>%s<button class="fchip" data-cat="">全部</button></div></div>
-<div class="mini-grid" id="itemList">%s</div>
-""" % (len(data["items"]), chips, cards)
+<div class="table-wrap">
+<table class="data-table" id="itemsTable">
+  <thead><tr><th>道具</th><th>类别</th><th class="num">售价</th><th>登场</th></tr></thead>
+  <tbody>%s</tbody>
+</table>
+</div>
+<div class="load-more-wrap"><button class="load-more" data-table="itemsTable" hidden>显示更多</button></div>
+""" % (len(data["items"]), chips, rows)
     return page("道具", body, "items", desc="宝可梦道具数据")
 
 
@@ -533,7 +564,7 @@ def render_types(data):
     cards = "".join(
         """<article class="type-card" id="t-%(name)s" style="--tc:%(color)s">
   <header><span class="type-dot"></span><h3>%(name)s</h3><i>%(en)s</i></header>
-  <p>%(desc)s</p>
+  %(desc_html)s
   <div class="type-rel">
     <span class="rel-label">克制</span>%(strong)s
   </div>
@@ -545,7 +576,7 @@ def render_types(data):
   </div>
 </article>""" % {
             "name": esc(t["name"]), "en": esc(t.get("en", "")), "color": t.get("color", "#8899aa"),
-            "desc": esc(t.get("desc", "")),
+            "desc_html": ('<p>%s</p>' % esc(t["desc"])) if t.get("desc") else "",
             "strong": "".join(type_chip(x, types, True) for x in t.get("strong", [])) or '<span class="dim">—</span>',
             "weak": "".join(type_chip(x, types, True) for x in t.get("weak", [])) or '<span class="dim">—</span>',
             "immune": "".join(type_chip(x, types, True) for x in t.get("immune", [])) or '<span class="dim">—</span>',
@@ -704,8 +735,16 @@ def render_about(data):
   </ul>
   <h2>构建</h2>
   <p><code>python3 site/build.py</code> 会把页面输出到 <code>docs/</code>，推送到 main 后由 GitHub Actions 自动部署到 Pages。</p>
+  <h2>数据来源</h2>
+  <ul class="bullets">
+    <li>图鉴、招式、特性、道具、属性相克等结构化数据来自 PokeAPI 的公开数据集（中文名称为官方简体译名）。</li>
+    <li>精灵立绘来自 PokeAPI/sprites 仓库的 96px 图鉴图像。</li>
+    <li>地区、人物、游戏、动画栏目为手工维护的框架数据，欢迎补充。</li>
+  </ul>
+  <h2>关于游戏整合包</h2>
+  <p>原始整合包的 <code>Data/*.dat</code> 与 <code>Graphics</code> 资源由 SAplay 打包器加密，无法直接读取；因此站内数值采用官方公开数据，未包含该改版的具体调整。</p>
   <h2>声明</h2>
-  <p>本站为非官方粉丝资料库，宝可梦相关名称与设定版权归任天堂、Game Freak 与 The Pokémon Company 所有。</p>
+  <p>本站为非官方粉丝资料库，宝可梦相关名称、图像与设定版权归任天堂、Game Freak 与 The Pokémon Company 所有，本站仅用于资料整理与学习交流。</p>
 </section>
 """
     return page("关于", body, "about", desc="关于本站")
@@ -770,7 +809,9 @@ def main():
     for name in os.listdir(STATIC):
         src = os.path.join(STATIC, name)
         dst = os.path.join(OUT, "assets", name)
-        if os.path.isfile(src):
+        if os.path.isdir(src):
+            shutil.copytree(src, dst)
+        elif os.path.isfile(src):
             shutil.copy2(src, dst)
 
     pages = {
