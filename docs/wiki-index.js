@@ -16,6 +16,10 @@
         });
     }
 
+    function dots(date) {
+        return String(date || "").replace(/-/g, ".");
+    }
+
     function readState() {
         var h = new URLSearchParams(location.hash.replace(/^#/, ""));
         return {
@@ -41,26 +45,37 @@
     var state = readState();
     var all = [];
 
+    function decorate(title, url, labels, date, extra) {
+        labels = labels || [];
+        var era = labels.filter(function (l) { return ERA_ORDER.indexOf(l) >= 0; })[0] || "";
+        var genres = labels.filter(function (l) {
+            return ERA_ORDER.indexOf(l) < 0 && SKIP_LABELS.indexOf(l) < 0;
+        });
+        return {
+            title: title || "",
+            url: url || "",
+            date: date || "",
+            year: (date || "").slice(0, 4),
+            era: era,
+            genres: genres,
+            excerpt: (extra && extra.excerpt) || "",
+            minutes: (extra && extra.minutes) || 0,
+            words: (extra && extra.words) || 0
+        };
+    }
+
     function normalize(data) {
-        return Object.keys(data)
+        if (data && Array.isArray(data.posts)) {
+            return data.posts.map(function (p) {
+                return decorate(p.title, p.url, p.labels, p.date, p);
+            });
+        }
+        return Object.keys(data || {})
             .filter(function (k) { return k.charAt(0) === "P"; })
             .map(function (k) {
                 var it = data[k];
-                var labels = (it.labels || []).slice();
-                var era = labels.filter(function (l) { return ERA_ORDER.indexOf(l) >= 0; })[0] || "";
-                var genres = labels.filter(function (l) {
-                    return ERA_ORDER.indexOf(l) < 0 && SKIP_LABELS.indexOf(l) < 0;
-                });
-                return {
-                    title: it.postTitle || "",
-                    url: it.postUrl || "",
-                    date: it.createdDate || "",
-                    year: (it.createdDate || "").slice(0, 4),
-                    era: era,
-                    genres: genres
-                };
-            })
-            .filter(function (x) { return x.title; });
+                return decorate(it.postTitle, it.postUrl, it.labels, it.createdDate, null);
+            });
     }
 
     function sortList(list) {
@@ -76,25 +91,37 @@
             if (state.era && x.era !== state.era) return false;
             if (state.genre && x.genres.indexOf(state.genre) < 0) return false;
             if (!q) return true;
-            var hay = (x.title + " " + x.date + " " + x.era + " " + x.genres.join(" ")).toLowerCase();
+            var hay = (x.title + " " + x.date + " " + x.era + " " + x.genres.join(" ") + " " + x.excerpt).toLowerCase();
             return hay.indexOf(q) >= 0;
         });
     }
 
     /* ---------- 页面骨架 ---------- */
 
+    var avatarSrc = (document.querySelector("#header .avatar") || {}).src || "";
     var hero = document.createElement("section");
     hero.className = "hero";
     hero.innerHTML =
-        '<div class="hero-eyebrow">Game Memoir Archive</div>' +
+        '<div class="hero-scan"></div>' +
+        '<div class="hero-inner">' +
+        '<div class="hero-avatar">' +
+        (avatarSrc ? '<img src="' + esc(avatarSrc) + '" alt="">' : "") +
+        "</div>" +
+        '<div class="hero-info">' +
+        '<div class="hero-eyebrow">Game Memoir // Archive</div>' +
         "<h1>游戏生涯回忆录</h1>" +
         '<div class="hero-range"><span id="rangeNum">—</span></div>' +
         '<p class="hero-desc">按时间往回走，一篇一个游戏。不写评测，不列优缺点，只写当时在哪、和谁、什么机器。</p>' +
+        '<div class="hero-stats">' +
+        '<div class="stat"><b id="statCount">—</b><span>条目</span></div>' +
+        '<div class="stat"><b id="statSpan">—</b><span>年份跨度</span></div>' +
+        '<div class="stat"><b id="statLast">—</b><span>最近更新</span></div>' +
+        "</div>" +
         '<div class="hero-actions">' +
         '<button class="btn-primary" id="heroBrowse">开始浏览</button>' +
         '<a class="btn-ghost" href="索引.html">卷目索引</a>' +
         "</div>" +
-        '<div class="hero-scroll" id="heroScroll"><span>scroll</span><span>▾</span></div>';
+        "</div></div>";
 
     var app = document.createElement("section");
     app.id = "wiki-app";
@@ -129,28 +156,40 @@
 
     /* ---------- 渲染 ---------- */
 
+    function hueOf(x) {
+        var n = 0;
+        for (var i = 0; i < x.title.length; i++) n = (n * 31 + x.title.charCodeAt(i)) % 360;
+        return 170 + (n % 80);
+    }
+
     function cardHTML(x) {
-        var tags = x.genres.map(function (g) { return '<span class="tag">' + esc(g) + "</span>"; }).join("");
+        var tag = x.genres[0] ? '<span class="tag">' + esc(x.genres[0]) + "</span>" : "";
+        var readTime = x.minutes ? '<span class="meta-dot"></span><span>' + x.minutes + " 分钟</span>" : "";
         return (
-            '<a class="card" href="' + esc(x.url) + '">' +
+            '<a class="card" href="' + esc(x.url) + '" style="--h:' + hueOf(x) + '">' +
             '<div class="card-cover">' +
             (x.era ? '<span class="card-era">' + esc(x.era) + "</span>" : "") +
             '<span class="card-year">' + esc(x.year || "----") + "</span>" +
+            '<span class="card-scan"></span>' +
             "</div>" +
             '<div class="card-body">' +
             '<h3 class="card-title">' + esc(x.title) + "</h3>" +
-            '<div class="card-tags">' + tags +
-            '<span class="tag tag-date">' + esc(x.date) + "</span></div>" +
+            (x.excerpt ? '<p class="card-excerpt">' + esc(x.excerpt) + "</p>" : "") +
+            '<div class="card-meta">' +
+            '<span>' + esc(dots(x.date)) + "</span>" + readTime + tag +
+            "</div>" +
             "</div></a>"
         );
     }
 
     function timelineHTML(x) {
+        var bits = [x.era].concat(x.genres).filter(Boolean).join(" · ");
+        if (x.minutes) bits += (bits ? " · " : "") + x.minutes + " 分钟";
         return (
             '<a class="tl-item" href="' + esc(x.url) + '">' +
-            '<div class="tl-year">' + esc(x.year || "----") + "</div>" +
+            '<div class="tl-year">' + esc(dots(x.date)) + "</div>" +
             '<div class="tl-title">' + esc(x.title) + "</div>" +
-            '<div class="tl-meta">' + esc([x.era].concat(x.genres).filter(Boolean).join(" · ")) + "</div>" +
+            '<div class="tl-meta">' + esc(bits) + "</div>" +
             "</a>"
         );
     }
@@ -172,7 +211,7 @@
             });
         }, { rootMargin: "0px 0px -8% 0px", threshold: 0.06 });
         cards.forEach(function (c, i) {
-            c.style.transitionDelay = Math.min(i, 8) * 45 + "ms";
+            c.style.transitionDelay = Math.min(i, 8) * 40 + "ms";
             observer.observe(c);
         });
     }
@@ -181,7 +220,7 @@
         var items = sortList(filtered());
 
         if (!items.length) {
-            listEl.innerHTML = '<div class="empty">没有匹配的条目<br><span style="font-size:12px">试试清空搜索或切换筛选</span></div>';
+            listEl.innerHTML = '<div class="empty">没有匹配的条目 · 试试清空搜索或切换筛选</div>';
         } else if (state.view === "timeline") {
             listEl.innerHTML = '<div class="wiki-timeline">' + items.map(timelineHTML).join("") + "</div>";
         } else {
@@ -189,7 +228,7 @@
             reveal();
         }
 
-        metaEl.textContent = "共 " + items.length + " 篇" + (items.length !== all.length ? " / 总计 " + all.length + " 篇" : "");
+        metaEl.textContent = "匹配 " + items.length + " 条" + (items.length !== all.length ? " / 共 " + all.length + " 条" : "");
 
         document.querySelectorAll(".view-switch button").forEach(function (b) {
             b.classList.toggle("active", b.dataset.view === state.view);
@@ -279,37 +318,54 @@
         }
     });
 
-    /* 兜底：动画被浏览器节流/跳过时，强制展示终态，避免内容长留不可见 */
-    setTimeout(function () { document.body.classList.add("anim-done"); }, 1400);
-
     document.getElementById("heroBrowse").addEventListener("click", function () {
         app.scrollIntoView({ behavior: "smooth", block: "start" });
         setTimeout(function () { searchEl.focus({ preventScroll: true }); }, 420);
     });
-    document.getElementById("heroScroll").addEventListener("click", function () {
-        app.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
 
-    /* ---------- 数据加载 ---------- */
+    /* 兜底：动画被浏览器节流/跳过时，强制展示终态，避免内容长留不可见 */
+    setTimeout(function () { document.body.classList.add("anim-done"); }, 1400);
 
-    fetch("postList.json", { cache: "no-cache" })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            all = normalize(data);
-            buildChips();
+    /* ---------- 数据加载（优先 wiki.json，回退 postList.json） ---------- */
 
-            var years = all.map(function (x) { return x.year; }).filter(Boolean).sort();
-            var rangeEl = document.getElementById("rangeNum");
-            if (years.length) {
-                var a = years[0], b = years[years.length - 1];
-                rangeEl.innerHTML = a === b ? "<em>" + esc(a) + "</em>" : esc(a) + " — <em>" + esc(b) + "</em>";
-            } else {
-                rangeEl.textContent = "尚未收录";
-            }
+    function fillStats() {
+        var years = all.map(function (x) { return x.year; }).filter(Boolean).sort();
+        var rangeEl = document.getElementById("rangeNum");
+        var spanEl = document.getElementById("statSpan");
+        document.getElementById("statCount").textContent = String(all.length).padStart(2, "0");
 
-            render();
+        if (years.length) {
+            var a = years[0], b = years[years.length - 1];
+            rangeEl.innerHTML = a === b ? "<em>" + esc(a) + "</em>" : esc(a) + " — <em>" + esc(b) + "</em>";
+            spanEl.textContent = a === b ? a : a + "–" + b;
+        } else {
+            rangeEl.textContent = "尚未收录";
+            spanEl.textContent = "—";
+        }
+
+        var dates = all.map(function (x) { return x.date; }).filter(Boolean).sort();
+        document.getElementById("statLast").textContent = dates.length ? dots(dates[dates.length - 1]) : "—";
+    }
+
+    function boot(list) {
+        all = list;
+        buildChips();
+        fillStats();
+        render();
+    }
+
+    fetch("wiki.json", { cache: "no-cache" })
+        .then(function (r) {
+            if (!r.ok) throw new Error("no wiki.json");
+            return r.json();
         })
+        .then(function (data) { boot(normalize(data)); })
         .catch(function () {
-            listEl.innerHTML = '<div class="empty">条目加载失败</div>';
+            fetch("postList.json", { cache: "no-cache" })
+                .then(function (r) { return r.json(); })
+                .then(function (data) { boot(normalize(data)); })
+                .catch(function () {
+                    listEl.innerHTML = '<div class="empty">条目加载失败</div>';
+                });
         });
 })();
