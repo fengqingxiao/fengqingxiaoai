@@ -52,6 +52,15 @@ ITEM_CATS = {
     "miracle-shooter": "奇迹发射器", "spelunking": "探险道具", "unused": "未使用",
 }
 
+EGG_GROUP_ZH = {
+    "monster": "怪兽", "water1": "水中1", "bug": "虫", "flying": "飞行",
+    "field": "陆上", "ground": "陆上", "fairy": "妖精", "grass": "植物",
+    "plant": "植物", "human-like": "人形", "humanshape": "人形",
+    "water3": "水中3", "mineral": "矿物", "amorphous": "不定形",
+    "indeterminate": "不定形", "water2": "水中2", "ditto": "百变怪",
+    "dragon": "龙", "undiscovered": "未发现", "no-eggs": "未发现",
+}
+
 TRIGGER_TEXT = {
     "1": "等级提升", "2": "通讯交换", "3": "使用道具",
     "4": "特殊条件", "5": "特殊条件", "6": "特殊条件", "7": "特殊条件", "8": "特殊条件",
@@ -167,6 +176,34 @@ def main():
             continue
         (hidden if r["is_hidden"] == "1" else abilities).setdefault(r["pokemon_id"], []).append(name)
 
+    egg_of = {}
+    for r in read("pokemon_egg_groups", csvdir):
+        egg_of.setdefault(r["species_id"], []).append(r["egg_group_id"])
+    egg_names = {r["id"]: EGG_GROUP_ZH.get(r["identifier"], r["identifier"]) for r in read("egg_groups", csvdir)}
+
+    # 可学招式：优先现代版本组，缺省回退到该宝可梦出现的最新版本组
+    LEARN_VG = {"25", "20", "17", "16"}
+    level_moves, machine_moves, seen_vg = {}, {}, {}
+    for r in read("pokemon_moves", csvdir):
+        pid, vg, method = r["pokemon_id"], r["version_group_id"], r["pokemon_move_method_id"]
+        if vg not in LEARN_VG:
+            continue
+        if seen_vg.get(pid) and seen_vg[pid] != vg:
+            continue
+        seen_vg[pid] = vg
+        name = move_zh.get(r["move_id"])
+        if not name:
+            continue
+        if method == "1":
+            lv = int(r["level"] or 0)
+            bucket = level_moves.setdefault(pid, {})
+            if lv not in bucket:
+                bucket[lv] = name
+        elif method == "4":
+            lst = machine_moves.setdefault(pid, [])
+            if name not in lst:
+                lst.append(name)
+
     children = {}
     for sid, r in species_rows.items():
         if r.get("evolves_from_species_id"):
@@ -179,7 +216,7 @@ def main():
             cur = species_rows.get(cur, {}).get("evolves_from_species_id") or ""
             guard += 1
         path.reverse()
-        for child in sorted(children.get(sid, []), key=lambda x: int(x))[:3]:
+        for child in sorted(children.get(sid, []), key=lambda x: int(x))[:9]:
             path.append(child)
         return path
 
@@ -224,7 +261,13 @@ def main():
             "stats": stats.get(row["id"], {}),
             "sprite": sprite,
             "dex": flavor.get(sid, ""),
-            "evolution": [{"name": species_zh.get(x, x), "method": evo_method(x)} for x in chain_of(sid)] if has_evo else [],
+            "eggGroups": [egg_names.get(e, e) for e in egg_of.get(sid, [])],
+            "hatchSteps": (int(species_rows[sid]["hatch_counter"] or 0) * 255),
+            "learnset": {
+                "level": [[lv, name] for lv, name in sorted(level_moves.get(row["id"], {}).items())],
+                "machine": machine_moves.get(row["id"], []),
+            },
+            "evolution": [{"id": int(x), "name": species_zh.get(x, x), "method": evo_method(x)} for x in chain_of(sid)] if has_evo else [],
         })
 
     pokemon.sort(key=lambda p: p["id"])
@@ -273,6 +316,33 @@ def main():
     with open(os.path.join(content, "items.json"), "w", encoding="utf-8") as f:
         json.dump(items, f, ensure_ascii=False, separators=(",", ":"))
     print("道具: %d 条" % len(items))
+
+    # ---------- 地点 ----------
+    region_zh = {r["region_id"]: r["name"] for r in read("region_names", csvdir) if r["local_language_id"] == ZH}
+    region_order = {"1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 8, "10": 9}
+    loc_zh = {r["location_id"]: r["name"] for r in read("location_names", csvdir) if r["local_language_id"] == ZH}
+    loc_en = {r["location_id"]: r["name"] for r in read("location_names", csvdir) if r["local_language_id"] == EN}
+    locations, seen = [], set()
+    for r in read("locations", csvdir):
+        rid = r.get("region_id")
+        if rid not in region_order:
+            continue
+        name = loc_zh.get(r["id"]) or loc_en.get(r["id"]) or r["identifier"].replace("-", " ").title()
+        key = (rid, name)
+        if key in seen:
+            continue
+        seen.add(key)
+        locations.append({
+            "name": name,
+            "en": loc_en.get(r["id"]) or r["identifier"].replace("-", " ").title(),
+            "region": region_zh.get(rid, rid),
+            "generation": region_order[rid],
+            "desc": "",
+        })
+    locations.sort(key=lambda x: (x["generation"], x["region"], x["name"]))
+    with open(os.path.join(content, "locations.json"), "w", encoding="utf-8") as f:
+        json.dump(locations, f, ensure_ascii=False, separators=(",", ":"))
+    print("地点: %d 条（中文名 %d 条）" % (len(locations), sum(1 for x in locations if x["name"] != x["en"])))
 
     eff = {(r["damage_type_id"], r["target_type_id"]): int(r["damage_factor"])
            for r in read("type_efficacy", csvdir)}

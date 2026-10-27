@@ -1,58 +1,120 @@
 [
-  {
-    "series": "宝可梦（无印）",
-    "en": "Original Series",
-    "year": 1997,
-    "episodes": "276",
-    "desc": "小智与皮卡丘从真新镇出发的旅程。"
-  },
-  {
-    "series": "宝可梦 超世代",
-    "en": "Advanced Generation",
-    "year": 2002,
-    "episodes": "192",
-    "desc": "舞台转向丰缘，加入宝可梦华丽大赛。"
-  },
-  {
-    "series": "宝可梦 钻石＆珍珠",
-    "en": "Diamond & Pearl",
-    "year": 2006,
-    "episodes": "191",
-    "desc": "神奥地区，小光与华丽大赛主线。"
-  },
-  {
-    "series": "宝可梦 超级愿望",
-    "en": "Best Wishes",
-    "year": 2010,
-    "episodes": "142",
-    "desc": "合众地区，重新出发的旅程。"
-  },
-  {
-    "series": "宝可梦 XY",
-    "en": "XY",
-    "year": 2013,
-    "episodes": "139",
-    "desc": "卡洛斯地区，超级进化登场。"
-  },
-  {
-    "series": "宝可梦 太阳＆月亮",
-    "en": "Sun & Moon",
-    "year": 2016,
-    "episodes": "146",
-    "desc": "阿罗拉地区，校园生活与岛屿试炼。"
-  },
-  {
-    "series": "宝可梦 旅途",
-    "en": "Journeys",
-    "year": 2019,
-    "episodes": "147",
-    "desc": "跨地区冒险，小智挑战世界锦标赛。"
-  },
-  {
-    "series": "宝可梦 地平线",
-    "en": "Horizons",
-    "year": 2023,
-    "episodes": "连载中",
-    "desc": "莉可与其伙伴的新世代故事。"
-  }
+ {
+  "series": "宝可梦（无印）",
+  "en": "Original Series",
+  "year": 1997,
+  "episodes": "276",
+  "desc": "小智与皮卡丘从真新镇出发的旅程。",
+  "characters": [
+   "小智",
+   "小霞",
+   "小刚",
+   "皮卡丘"
+  ],
+  "slug": "1997",
+  "watch": "请在官方授权平台（如哔哩哔哩、Netflix 等）观看，本页不提供片源。"
+ },
+ {
+  "series": "宝可梦 超世代",
+  "en": "Advanced Generation",
+  "year": 2002,
+  "episodes": "192",
+  "desc": "舞台转向丰缘，加入宝可梦华丽大赛。",
+  "characters": [
+   "小智",
+   "小遥",
+   "小刚",
+   "皮卡丘"
+  ],
+  "slug": "2002",
+  "watch": "请在官方授权平台（如哔哩哔哩、Netflix 等）观看，本页不提供片源。"
+ },
+ {
+  "series": "宝可梦 钻石＆珍珠",
+  "en": "Diamond & Pearl",
+  "year": 2006,
+  "episodes": "191",
+  "desc": "神奥地区，小光与华丽大赛主线。",
+  "characters": [
+   "小智",
+   "小光",
+   "小刚",
+   "皮卡丘"
+  ],
+  "slug": "2006",
+  "watch": "请在官方授权平台（如哔哩哔哩、Netflix 等）观看，本页不提供片源。"
+ },
+ {
+  "series": "宝可梦 超级愿望",
+  "en": "Best Wishes",
+  "year": 2010,
+  "episodes": "142",
+  "desc": "合众地区，重新出发的旅程。",
+  "characters": [
+   "小智",
+   "艾莉丝",
+   "天桐",
+   "皮卡丘"
+  ],
+  "slug": "2010",
+  "watch": "请在官方授权平台（如哔哩哔哩、Netflix 等）观看，本页不提供片源。"
+ },
+ {
+  "series": "宝可梦 XY",
+  "en": "XY",
+  "year": 2013,
+  "episodes": "139",
+  "desc": "卡洛斯地区，超级进化登场。",
+  "characters": [
+   "小智",
+   "莎莉娜",
+   "希特隆",
+   "柚丽嘉"
+  ],
+  "slug": "2013",
+  "watch": "请在官方授权平台（如哔哩哔哩、Netflix 等）观看，本页不提供片源。"
+ },
+ {
+  "series": "宝可梦 太阳＆月亮",
+  "en": "Sun & Moon",
+  "year": 2016,
+  "episodes": "146",
+  "desc": "阿罗拉地区，校园生活与岛屿试炼。",
+  "characters": [
+   "小智",
+   "莉莉艾",
+   "水莲",
+   "玛奥"
+  ],
+  "slug": "2016",
+  "watch": "请在官方授权平台（如哔哩哔哩、Netflix 等）观看，本页不提供片源。"
+ },
+ {
+  "series": "宝可梦 旅途",
+  "en": "Journeys",
+  "year": 2019,
+  "episodes": "147",
+  "desc": "跨地区冒险，小智挑战世界锦标赛。",
+  "characters": [
+   "小智",
+   "小豪",
+   "皮卡丘"
+  ],
+  "slug": "2019",
+  "watch": "请在官方授权平台（如哔哩哔哩、Netflix 等）观看，本页不提供片源。"
+ },
+ {
+  "series": "宝可梦 地平线",
+  "en": "Horizons",
+  "year": 2023,
+  "episodes": "连载中",
+  "desc": "莉可与其伙伴的新世代故事。",
+  "characters": [
+   "莉可",
+   "罗伊",
+   "弗里德"
+  ],
+  "slug": "2023",
+  "watch": "请在官方授权平台（如哔哩哔哩、Netflix 等）观看，本页不提供片源。"
+ }
 ]

@@ -4,6 +4,7 @@
 读取 site/content/*.json，生成 docs/ 下的静态页面。
 不依赖任何第三方库，构建命令：python3 site/build.py
 """
+import hashlib
 import json
 import math
 import os
@@ -18,6 +19,8 @@ OUT = os.path.join(os.path.dirname(ROOT), "docs")
 
 SITE_NAME = "宝可梦图鉴"
 SITE_EN = "POKÉMON ATLAS"
+SITE_URL = "https://fengqingxiao.github.io/fengqingxiaoai"
+ASSET_VER = ""
 SITE_DESC = "一个由数据驱动的宝可梦资料库：图鉴、招式、特性、道具、属性相克与世代沿革。"
 
 NAV = [
@@ -55,11 +58,11 @@ def type_color(types, name):
     return "#8899aa"
 
 
-def type_chip(name, types, small=False, link=True):
+def type_chip(name, types, small=False, link=True, prefix=""):
     """link=False 时输出 span：卡片本身就是 <a>，HTML 不允许嵌套链接。"""
     cls = "chip-type chip-type-sm" if small else "chip-type"
     tag = "a" if link else "span"
-    href = ' href="types.html#t-%s"' % esc(name) if link else ""
+    href = ' href="%stypes.html#t-%s"' % (prefix, esc(name)) if link else ""
     return '<%s class="%s"%s style="--tc:%s">%s</%s>' % (
         tag, cls, href, type_color(types, name), esc(name), tag)
 
@@ -76,8 +79,11 @@ def stat_bar(label, value, maxv=255):
     )
 
 
-def page(title, body, active="", desc="", depth=0):
+def page(title, body, active="", desc="", depth=0, page_path="", og_image=""):
     prefix = "../" * depth
+    if not page_path:
+        page_path = "index.html" if active == "home" else (active + ".html" if active else "")
+    og_image_html = '<meta property="og:image" content="%s/assets/%s">' % (SITE_URL, og_image) if og_image else ""
     nav_html = "".join(
         '<a class="nav-link%s" href="%s%s">%s</a>'
         % (" is-active" if key == active else "", prefix, url, esc(label))
@@ -90,8 +96,15 @@ def page(title, body, active="", desc="", depth=0):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>%s · %s</title>
 <meta name="description" content="%s">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="%s">
+<meta property="og:title" content="%s · %s">
+<meta property="og:description" content="%s">
+<meta property="og:url" content="%s/%s">
+%s
+<link rel="canonical" href="%s/%s">
 <link rel="icon" href="%sassets/favicon.svg">
-<link rel="stylesheet" href="%sassets/style.css">
+<link rel="stylesheet" href="%sassets/style.css%s">
 </head>
 <body data-depth="%d">
 <header class="topbar">
@@ -128,12 +141,17 @@ def page(title, body, active="", desc="", depth=0):
     <div class="search-results" id="searchResults"></div>
   </div>
 </div>
-<script src="%sassets/app.js" defer></script>
+<script src="%sassets/app.js%s" defer></script>
 </body>
 </html>
 """ % (
-        esc(title), SITE_NAME, esc(desc or SITE_DESC), prefix, prefix, depth, prefix,
-        esc(SITE_NAME), esc(SITE_EN), nav_html, body, esc(SITE_NAME), prefix)
+        esc(title), esc(SITE_NAME), esc(desc or SITE_DESC),
+        esc(SITE_NAME), esc(title), esc(SITE_NAME),
+        esc(desc or SITE_DESC), SITE_URL, esc(page_path), og_image_html,
+        SITE_URL, esc(page_path),
+        prefix, prefix, ASSET_VER,
+        depth, prefix, esc(SITE_NAME), esc(SITE_EN), nav_html, body, esc(SITE_NAME),
+        prefix, ASSET_VER)
 
 
 # ---------------------------------------------------------------- 首页
@@ -235,7 +253,7 @@ def render_index(data):
         "desc": esc(SITE_DESC), "stats": stats, "cards": cards,
         "featured": featured, "timeline": timeline,
     }
-    return page("首页", body, "home")
+    return page("首页", body, "home", page_path="index.html")
 
 
 # ---------------------------------------------------------------- 图鉴
@@ -261,7 +279,7 @@ def render_pokedex(data):
             "hp": p.get("stats", {}).get("hp", 0),
             "atk": p.get("stats", {}).get("atk", 0),
             "spe": p.get("stats", {}).get("spe", 0),
-            "img": ('<img src="assets/%s" loading="lazy" alt="%s">' % (p["sprite"], p["name"])) if p.get("sprite") else "",
+            "img": ('<img src="assets/%s" width="96" height="96" loading="lazy" decoding="async" alt="%s">' % (p["sprite"], p["name"])) if p.get("sprite") else "",
         }
         for p in pokemon
     ) or '<p class="muted">暂无数据。</p>'
@@ -313,7 +331,7 @@ def render_pokedex(data):
         "count": len(pokemon), "type_filters": type_filters,
         "gen_filters": gen_filters, "cards": cards,
     }
-    return page("图鉴", body, "pokedex", desc="按属性与世代检索宝可梦")
+    return page("图鉴", body, "pokedex", desc="按属性与世代检索宝可梦", page_path="pokedex.html")
 
 
 def render_pokemon(p, data, prev_p, next_p):
@@ -340,7 +358,12 @@ def render_pokemon(p, data, prev_p, next_p):
         chain = p["evolution"]
         parts = []
         for i, step in enumerate(chain):
-            parts.append('<span class="evo-node"><b>%s</b></span>' % esc(step.get("name", "")))
+            name = esc(step.get("name", ""))
+            sid = step.get("id")
+            if sid and int(sid) != int(p["id"]):
+                parts.append('<a class="evo-node" href="%s.html"><b>%s</b></a>' % (esc(sid), name))
+            else:
+                parts.append('<span class="evo-node is-current"><b>%s</b></span>' % name)
             if i < len(chain) - 1:
                 label = chain[i + 1].get("method") or "→"
                 parts.append('<span class="evo-arrow">%s</span>' % esc(label))
@@ -359,6 +382,25 @@ def render_pokemon(p, data, prev_p, next_p):
             bits.append("特性为%s" % "、".join(p["abilities"]))
         dex_para = "，".join(bits) + "。"
     dex_text = '<section class="panel"><h2>图鉴说明</h2><p class="dex-text">%s</p></section>' % esc(dex_para)
+    move_index = {m["name"]: m for m in data.get("moves", [])}
+    learn = p.get("learnset") or {}
+    learn_html = ""
+    if learn.get("level") or learn.get("machine"):
+        rows = "".join(
+            '<tr><td class="num">%s</td><td>%s</td><td>%s</td></tr>' % (
+                esc(lv), esc(name),
+                type_chip(move_index[name]["type"], data["types"], True, prefix="../") if name in move_index else "")
+            for lv, name in learn.get("level", [])[:60]
+        )
+        level_table = ('<div class="table-wrap"><table class="data-table compact"><thead><tr><th class="num">等级</th><th>招式</th><th>属性</th></tr></thead><tbody>%s</tbody></table></div>' % rows) if rows else '<p class="muted">暂无等级招式数据。</p>'
+        chips = "".join(
+            '<span class="chip-move">%s%s</span>' % (
+                esc(name), ('<i style="--tc:%s"></i>' % type_color(data["types"], move_index[name]["type"])) if name in move_index else "")
+            for name in learn.get("machine", [])
+        ) or '<span class="muted">暂无学习器数据。</span>'
+        learn_html = ('<section class="panel"><h2>可学招式 · 升级</h2>%s</section>'
+                      '<section class="panel"><h2>可学招式 · 学习器</h2><div class="move-chips">%s</div></section>') % (level_table, chips)
+
     trivia = ""
     if p.get("trivia"):
         trivia = '<section class="panel"><h2>补充</h2><ul class="bullets">%s</ul></section>' % "".join(
@@ -394,6 +436,8 @@ def render_pokemon(p, data, prev_p, next_p):
       %s
       %s
       %s
+      %s
+      %s
     </dl>
   </aside>
   <section class="panel">
@@ -406,22 +450,25 @@ def render_pokemon(p, data, prev_p, next_p):
 %s
 %s
 %s
+%s
 """ % (
         esc(p["name"]), type_color(types, p["types"][0]), esc(p["id"]), esc(p["name"]), esc(p.get("en", "")),
-        "".join(type_chip(t, types) for t in p.get("types", [])),
+        "".join(type_chip(t, types, prefix="../") for t in p.get("types", [])),
         type_color(types, p["types"][0]),
-        ('<img src="../assets/%s" alt="%s">' % (p["sprite"], p["name"])) if p.get("sprite") else "",
+        ('<img src="../assets/%s" width="96" height="96" decoding="async" alt="%s">' % (p["sprite"], p["name"])) if p.get("sprite") else "",
         info_row("分类", esc(p.get("category", ""))),
         info_row("特性", abilities),
         info_row("身高", ("%s m" % p["height"]) if p.get("height") else ""),
         info_row("体重", ("%s kg" % p["weight"]) if p.get("weight") else ""),
         info_row("性别比例", esc(p.get("gender", ""))),
         info_row("登场世代", ("第 %s 世代" % p["generation"]) if p.get("generation") else ""),
+        info_row("蛋组", esc("、".join(p.get("eggGroups", [])))),
+        info_row("孵化步数", ("约 %d 步" % p["hatchSteps"]) if p.get("hatchSteps") else ""),
         info_row("捕获率", esc(p.get("catchRate", ""))),
         info_row("基础经验", esc(p.get("exp", ""))),
-        stat_html, dex_text, evo, trivia, nav,
+        stat_html, dex_text, evo, learn_html, trivia, nav,
     )
-    return page(p["name"], body, "pokedex", desc="%s（%s）的资料页" % (p["name"], p.get("en", "")), depth=1)
+    return page(p["name"], body, "pokedex", desc="%s（%s）的资料页" % (p["name"], p.get("en", "")), depth=1, page_path="pokemon/%s.html" % p["id"], og_image=p.get("sprite", ""))
 
 
 # ---------------------------------------------------------------- 通用列表页
@@ -441,7 +488,12 @@ def render_moves(data):
             "type": type_chip(m.get("type", "一般"), data["types"], True),
             "cat": esc(m.get("category", "变化")), "power": esc(m.get("power", "—")),
             "acc": esc(m.get("accuracy", "—")), "pp": esc(m.get("pp", "—")),
-            "desc": esc(m.get("desc", "")),
+            "desc": esc(m.get("desc") or "%s属性%s招式，威力 %s，命中 %s，PP %s，第 %s 世代登场。" % (
+                m.get("type", ""), m.get("category", ""),
+                m.get("power") if m.get("power") else "—",
+                m.get("accuracy") if m.get("accuracy") else "—",
+                m.get("pp") if m.get("pp") else "—",
+                m.get("generation", "—"))),
         }
         for m in data["moves"]
     ) or '<tr><td colspan="7" class="muted">暂无数据，把招式写入 site/content/moves.json。</td></tr>'
@@ -464,16 +516,17 @@ def render_moves(data):
 </div>
 <div class="load-more-wrap"><button class="load-more" data-table="movesTable" hidden>显示更多</button></div>
 """ % (len(data["moves"]), rows)
-    return page("招式", body, "moves", desc="宝可梦招式数据")
+    return page("招式", body, "moves", desc="宝可梦招式数据", page_path="moves.html")
 
 
 def render_abilities(data):
     rows = "".join(
         """<tr>
   <td class="col-name"><a href="#a-%(name)s">%(name)s</a><i>%(en)s</i></td>
-  <td class="dim">第 %(gen)s 世代</td>
+  <td class="dim">第 %(gen)s 世代登场的特性。%(note)s</td>
 </tr>""" % {
             "name": esc(a["name"]), "en": esc(a.get("en", "")), "gen": esc(a.get("generation", "—")),
+            "note": "具体效果以游戏内说明为准。",
         }
         for a in data["abilities"]
     ) or '<tr><td colspan="2" class="muted">暂无数据。</td></tr>'
@@ -495,7 +548,7 @@ def render_abilities(data):
 </table>
 </div>
 """ % (len(data["abilities"]), rows)
-    return page("特性", body, "abilities", desc="宝可梦特性数据")
+    return page("特性", body, "abilities", desc="宝可梦特性数据", page_path="abilities.html")
 
 
 def render_items(data):
@@ -534,7 +587,7 @@ def render_items(data):
 </div>
 <div class="load-more-wrap"><button class="load-more" data-table="itemsTable" hidden>显示更多</button></div>
 """ % (len(data["items"]), chips, rows)
-    return page("道具", body, "items", desc="宝可梦道具数据")
+    return page("道具", body, "items", desc="宝可梦道具数据", page_path="items.html")
 
 
 def render_types(data):
@@ -596,11 +649,41 @@ def render_types(data):
     <tbody>%s</tbody>
   </table>
 </div>
+<section class="panel calc">
+  <h2>属性组合计算器</h2>
+  <p class="calc-note">选择一到两个属性，查看该组合受到各属性攻击时的倍率。</p>
+  <div class="calc-controls">
+    <label>属性一 <select id="calcA"></select></label>
+    <label>属性二 <select id="calcB"><option value="">无</option></select></label>
+  </div>
+  <div class="calc-result" id="calcResult"></div>
+</section>
+
 <div class="matrix-legend"><span class="eff2">2</span> 效果拔群 <span class="eff-half">½</span> 效果不佳 <span class="eff0">0</span> 无效 <span class="eff1">空白</span> 一般</div>
 <section class="section"><div class="section-head"><h2>属性说明</h2></div>
 <div class="type-grid">%s</div></section>
 """ % (head_cells, "".join(matrix_rows), cards)
-    return page("属性", body, "types", desc="18 属性相克关系")
+    chart = {}
+    for atk in types:
+        row = {}
+        for d in atk.get("strong", []):
+            row[d] = 2
+        for d in atk.get("weak", []):
+            row[d] = 0.5
+        for d in atk.get("immune", []):
+            row[d] = 0
+        chart[atk["name"]] = row
+    chart_js = json.dumps(chart, ensure_ascii=False, separators=(",", ":"))
+    body = body.replace("</section>\n<div class=\"table-wrap matrix-wrap\">", "</section>\n<div class=\"table-wrap matrix-wrap\">")
+    body += '<script id="typeChart" type="application/json">%s</script>' % chart_js
+    return page("属性", body, "types", desc="18 属性相克关系", page_path="types.html")
+
+
+REGION_POS = {
+    "关都": (20, 28), "城都": (15, 45), "丰缘": (26, 66), "神奥": (44, 20),
+    "洗翠": (54, 14), "合众": (66, 32), "卡洛斯": (52, 48), "阿罗拉": (80, 62),
+    "伽勒尔": (72, 10), "帕底亚": (42, 78),
+}
 
 
 def render_locations(data):
@@ -611,29 +694,40 @@ def render_locations(data):
     for region, items in groups.items():
         cards = "".join(
             """<article class="mini-card" id="l-%(name)s">
-  <span class="mini-tag">%(gen)s</span>
-  <h3>%(name)s <i>%(en)s</i></h3>
-  <p>%(desc)s</p>
+  <span class="mini-tag">第 %(gen)s 世代</span>
+  <h3>%(name)s%(en)s</h3>
 </article>""" % {
-                "gen": esc(loc.get("generation", "")), "name": esc(loc["name"]), "en": esc(loc.get("en", "")),
-                "desc": esc(loc.get("desc", "")),
+                "gen": esc(loc.get("generation", "")), "name": esc(loc["name"]),
+                "en": (' <i>%s</i>' % esc(loc["en"])) if loc.get("en") and loc.get("en") != loc["name"] else "",
             }
             for loc in items
         )
         sections.append(
-            '<section class="section" id="r-%s"><div class="section-head"><h2>%s地区</h2><span class="section-note">%d 个地点</span></div><div class="mini-grid">%s</div></section>'
+            '<section class="section" id="r-%s"><div class="section-head"><h2>%s地区</h2><span class="section-note">%d 个地点</span></div>'
+            '<div class="mini-grid chunked" data-step="24">%s</div>'
+            '<div class="load-more-wrap"><button class="load-more chunk-btn" hidden>显示更多</button></div></section>'
             % (esc(region), esc(region), len(items), cards)
         )
+
+    nodes = []
+    for region, items in groups.items():
+        x, y = REGION_POS.get(region, (50, 50))
+        nodes.append(
+            '<a class="map-node" href="#r-%s" style="left:%d%%;top:%d%%"><i></i><b>%s</b><em>%d</em></a>'
+            % (esc(region), x, y, esc(region), len(items))
+        )
+    map_html = ('<div class="region-map"><div class="map-grid"></div>%s</div>' % "".join(nodes)) if nodes else ""
 
     body = """
 <section class="page-head">
   <p class="eyebrow">REGIONS</p>
   <h1>地区与地点</h1>
-  <p class="lede">按地区归档的城镇、道路与特殊场景。</p>
+  <p class="lede">点击地图上的地区可跳转到对应地点列表。</p>
 </section>
 %s
-""" % ("".join(sections) or '<p class="muted">暂无数据。</p>')
-    return page("地区", body, "locations", desc="宝可梦世界地区与地点")
+%s
+""" % (map_html, "".join(sections) or '<p class="muted">暂无数据。</p>')
+    return page("地区", body, "locations", desc="宝可梦世界地区与地点", page_path="locations.html")
 
 
 def render_characters(data):
@@ -662,7 +756,7 @@ def render_characters(data):
 </div>
 <div class="mini-grid" id="charList">%s</div>
 """ % cards
-    return page("人物", body, "characters", desc="宝可梦系列人物")
+    return page("人物", body, "characters", desc="宝可梦系列人物", page_path="characters.html")
 
 
 def render_games(data):
@@ -689,18 +783,18 @@ def render_games(data):
 </section>
 <div class="game-list">%s</div>
 """ % (rows or '<p class="muted">暂无数据。</p>')
-    return page("游戏", body, "games", desc="宝可梦游戏世代")
+    return page("游戏", body, "games", desc="宝可梦游戏世代", page_path="games.html")
 
 
 def render_anime(data):
     rows = "".join(
-        """<article class="anime-row">
+        """<a class="anime-row" href="anime/%s.html">
   <div class="anime-year">%s</div>
   <div class="anime-main"><h3>%s <i>%s</i></h3><p>%s</p></div>
   <div class="anime-ep">%s 集</div>
-</article>""" % (
-            esc(a.get("year", "")), esc(a.get("series", "")), esc(a.get("en", "")),
-            esc(a.get("desc", "")), esc(a.get("episodes", "—")),
+</a>""" % (
+            esc(a.get("slug") or a.get("year", "")), esc(a.get("year", "")), esc(a.get("series", "")),
+            esc(a.get("en", "")), esc(a.get("desc", "")), esc(a.get("episodes", "—")),
         )
         for a in data["anime"]
     ) or '<p class="muted">暂无数据。</p>'
@@ -713,7 +807,46 @@ def render_anime(data):
 </section>
 <div class="anime-list">%s</div>
 """ % rows
-    return page("动画", body, "anime", desc="宝可梦动画系列")
+    return page("动画", body, "anime", desc="宝可梦动画系列", page_path="anime.html")
+
+
+def render_anime_series(a, characters):
+    casts = ""
+    for name in a.get("characters", []):
+        hit = next((c for c in characters if c["name"] == name), None)
+        if hit:
+            casts += '<a class="cast" href="../characters.html#c-%s"><b>%s</b><span>%s</span></a>' % (
+                esc(name), esc(name), esc(hit.get("role", "")))
+        else:
+            casts += '<span class="cast"><b>%s</b></span>' % esc(name)
+
+    body = """
+<nav class="crumbs"><a href="../index.html">首页</a><i>/</i><a href="../anime.html">动画</a><i>/</i><span>%s</span></nav>
+
+<section class="page-head">
+  <p class="eyebrow">ANIMATION · %s</p>
+  <h1>%s</h1>
+  <p class="lede">%s</p>
+</section>
+
+<section class="panel">
+  <h2>基本信息</h2>
+  <dl class="info-list">
+    <div class="info-row"><dt>英文名</dt><dd>%s</dd></div>
+    <div class="info-row"><dt>开播年份</dt><dd>%s</dd></div>
+    <div class="info-row"><dt>集数</dt><dd>%s 集</dd></div>
+  </dl>
+</section>
+
+<section class="panel"><h2>登场人物</h2><div class="cast-list">%s</div></section>
+<section class="panel"><h2>观看方式</h2><p class="dex-text">%s</p></section>
+""" % (
+        esc(a.get("series", "")), esc(a.get("year", "")), esc(a.get("series", "")), esc(a.get("desc", "")),
+        esc(a.get("en", "—")), esc(a.get("year", "—")), esc(a.get("episodes", "—")),
+        casts or '<span class="muted">暂无数据。</span>', esc(a.get("watch", "")),
+    )
+    return page(a.get("series", "动画"), body, "anime", desc=a.get("desc", ""),
+                depth=1, page_path="anime/%s.html" % a.get("slug", ""))
 
 
 def render_about(data):
@@ -747,7 +880,7 @@ def render_about(data):
   <p>本站为非官方粉丝资料库，宝可梦相关名称、图像与设定版权归任天堂、Game Freak 与 The Pokémon Company 所有，本站仅用于资料整理与学习交流。</p>
 </section>
 """
-    return page("关于", body, "about", desc="关于本站")
+    return page("关于", body, "about", desc="关于本站", page_path="about.html")
 
 
 # ---------------------------------------------------------------- 搜索索引
@@ -789,6 +922,13 @@ def build_search_index(data):
 # ---------------------------------------------------------------- 主流程
 
 def main():
+    global ASSET_VER
+    digest = hashlib.md5()
+    for name in ("style.css", "app.js"):
+        with open(os.path.join(STATIC, name), "rb") as f:
+            digest.update(f.read())
+    ASSET_VER = "?v=" + digest.hexdigest()[:8]
+
     data = {
         "pokemon": load("pokemon"),
         "moves": load("moves"),
@@ -828,6 +968,10 @@ def main():
         "about.html": render_about(data),
     }
 
+    for a in data["anime"]:
+        if a.get("slug"):
+            pages["anime/%s.html" % a["slug"]] = render_anime_series(a, data["characters"])
+
     pokemon = sorted(data["pokemon"], key=lambda p: p.get("id", 0))
     for i, p in enumerate(pokemon):
         pages["pokemon/%s.html" % p["id"]] = render_pokemon(
@@ -835,6 +979,10 @@ def main():
             pokemon[i - 1] if i > 0 else None,
             pokemon[i + 1] if i < len(pokemon) - 1 else None,
         )
+
+    for a in data["anime"]:
+        if a.get("slug"):
+            pages["anime/%s.html" % a["slug"]] = render_anime_series(a, data["characters"])
 
     for path, html in pages.items():
         full = os.path.join(OUT, path)
@@ -848,7 +996,18 @@ def main():
     with open(os.path.join(OUT, "404.html"), "w", encoding="utf-8") as f:
         f.write(page("页面不存在", '<section class="page-head"><h1>404</h1><p class="lede">这个条目还没有被收录。<a href="index.html">回到首页</a></p></section>', desc="页面不存在"))
 
-    print("构建完成：%d 个页面 → %s" % (len(pages) + 2, OUT))
+    urls = ["index.html"] + [x for x in pages if x != "index.html"]
+    with open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8") as f:
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        f.write('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
+        for u in urls:
+            loc = SITE_URL + "/" + ("" if u == "index.html" else u)
+            f.write("  <url><loc>%s</loc></url>\n" % loc)
+        f.write("</urlset>\n")
+    with open(os.path.join(OUT, "robots.txt"), "w", encoding="utf-8") as f:
+        f.write("User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % SITE_URL)
+
+    print("构建完成：%d 个页面 → %s（资源版本 %s）" % (len(pages) + 2, OUT, ASSET_VER))
 
 
 if __name__ == "__main__":

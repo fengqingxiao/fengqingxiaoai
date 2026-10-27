@@ -1125,3 +1125,149 @@ h1, h2, h3, h4 { margin: 0; line-height: 1.25; letter-spacing: -0.01em; }
     background: color-mix(in srgb, var(--violet) 10%, #fff);
     border-color: color-mix(in srgb, var(--violet) 22%, var(--line));
 }
+
+/* ---------------- 属性组合计算器 ---------------- */
+
+.calc { margin-bottom: 18px; }
+.calc-note { margin: -4px 0 14px; color: var(--ink-3); font-size: 12.5px; }
+.calc-controls { display: flex; flex-wrap: wrap; gap: 14px; }
+
+.calc-controls label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-2);
+}
+
+.calc-controls select {
+    padding: 8px 12px;
+    border-radius: 9px;
+    border: 1px solid var(--line-2);
+    background: #fff;
+    color: var(--ink);
+    font-size: 13.5px;
+    cursor: pointer;
+}
+
+.calc-result { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.calc-row { display: flex; align-items: flex-start; gap: 12px; }
+.calc-label {
+    flex: 0 0 74px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    padding-top: 4px;
+    color: var(--ink-2);
+}
+.calc-row.is-x4 .calc-label { color: #c81e3c; }
+.calc-row.is-x2 .calc-label { color: #e0621f; }
+.calc-row.is-half .calc-label { color: #1b6cd0; }
+.calc-row.is-zero .calc-label { color: #566579; }
+.calc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.calc-empty { color: var(--ink-3); font-size: 12.5px; padding-top: 4px; }
+
+/* ---------------- 地区地图 ---------------- */
+
+.region-map {
+    position: relative;
+    height: 360px;
+    margin: 8px 0 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background:
+        radial-gradient(60% 60% at 30% 30%, rgba(43, 124, 255, 0.08), transparent 70%),
+        radial-gradient(50% 50% at 75% 70%, rgba(139, 92, 255, 0.08), transparent 70%),
+        var(--bg-soft);
+    overflow: hidden;
+}
+
+.map-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(43, 124, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(43, 124, 255, 0.07) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: radial-gradient(80% 80% at 50% 50%, #000, transparent 92%);
+    -webkit-mask-image: radial-gradient(80% 80% at 50% 50%, #000, transparent 92%);
+}
+
+.map-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    color: var(--ink) !important;
+    transition: all .22s var(--ease);
+}
+
+.map-node i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--grad-main);
+    box-shadow: 0 0 0 4px rgba(43, 124, 255, 0.14), 0 0 14px rgba(43, 124, 255, 0.4);
+}
+
+.map-node b { font-size: 13px; }
+.map-node em { font-style: normal; font-family: var(--mono); font-size: 10px; color: var(--ink-3); }
+
+.map-node:hover { background: #fff; box-shadow: var(--shadow-md); transform: translate(-50%, -50%) scale(1.06); }
+
+/* ---------------- 番剧与人物 ---------------- */
+
+.cast-list { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.cast {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    color: var(--ink) !important;
+    transition: all .2s var(--ease);
+}
+
+.cast:hover { border-color: var(--line-2); background: #fff; box-shadow: var(--shadow-sm); }
+.cast b { font-size: 14px; }
+.cast span { font-size: 11.5px; color: var(--ink-3); }
+
+a.anime-row { color: inherit !important; }
+a.anime-row:hover { border-color: var(--line-2); box-shadow: var(--shadow-md); }
+
+a.evo-node { color: var(--ink) !important; transition: all .2s var(--ease); }
+a.evo-node:hover { border-color: var(--line-2); background: #fff; box-shadow: var(--shadow-sm); }
+.evo-node.is-current { background: color-mix(in srgb, var(--blue) 8%, #fff); border-color: color-mix(in srgb, var(--blue) 28%, var(--line)); font-weight: 600; }
+
+/* ---------------- 招式与表格 ---------------- */
+
+.move-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.chip-move {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    font-size: 12.5px;
+    color: var(--ink-2);
+}
+
+.chip-move i { width: 7px; height: 7px; border-radius: 50%; background: var(--tc, var(--blue)); }
+
+.data-table.compact { min-width: 0; }
+.data-table.compact th, .data-table.compact td { padding: 7px 12px; font-size: 13px; }
+
+@media (max-width: 760px) {
+    .region-map { height: 300px; }
+    .calc-label { flex-basis: 62px; }
+}
