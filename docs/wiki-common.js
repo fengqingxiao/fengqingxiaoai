@@ -18,6 +18,8 @@
     var base = siteBase();
     var postBody = qs("#postBody");
 
+    if (qs(".subnav-search")) document.body.classList.add("is-search");
+
     var tagSearch = qs(".subnav-search-input");
     if (tagSearch && !tagSearch.placeholder) tagSearch.placeholder = "搜索标签或标题";
 
@@ -91,7 +93,9 @@
                 .sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
 
             var here = decodeURIComponent(location.pathname.split("/").pop() || "");
-            var i = list.findIndex(function (x) { return decodeURIComponent(x.url) === here; });
+            var i = list.findIndex(function (x) {
+                return decodeURIComponent(x.url).split("/").pop() === here;
+            });
             if (i < 0) return;
 
             var nav = document.createElement("div");

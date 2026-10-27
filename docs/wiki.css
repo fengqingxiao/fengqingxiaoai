@@ -169,6 +169,7 @@ a[onclick^="modeSwitch"] { display: none !important; }
 #content {
     position: relative;
     z-index: 1;
+    width: 100%;
     max-width: 1240px;
     margin: 0 auto;
     padding: 60px clamp(14px, 4vw, 44px) 0;
@@ -177,7 +178,7 @@ a[onclick^="modeSwitch"] { display: none !important; }
 html #footer {
     position: relative;
     z-index: 1;
-    margin: 90px auto 0;
+    margin: 88px auto 0;
     padding: 26px clamp(14px, 4vw, 44px) 44px;
     max-width: 1240px;
     border-top: 1px solid var(--line);
@@ -922,6 +923,10 @@ h1.postTitle {
 .tagTitle { font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--fg); }
 .tagTitle span { color: var(--cyan); }
 
+body.is-search #header .title-right { flex: 1; margin-left: 0; }
+body.is-search .subnav-search { flex: 1; }
+body.is-search .subnav-search input.form-control { width: 100% !important; }
+
 .subnav-search { display: flex; align-items: center; gap: 6px; margin-right: auto; position: relative; }
 .subnav-search .subnav-search-icon { position: absolute; left: 11px; color: var(--faint); pointer-events: none; z-index: 2; }
 
@@ -983,7 +988,15 @@ nav.SideNav a.SideNav-item {
 nav.SideNav a.SideNav-item:last-child { border-bottom: none !important; }
 nav.SideNav a.SideNav-item:hover { background: rgba(34, 211, 238, 0.06); }
 .listTitle { font-size: 14.5px; }
-nav.SideNav .Label, .listLabels .Label { margin-left: 4px; filter: saturate(0.45) brightness(0.85); }
+nav.SideNav .Label,
+.listLabels .Label,
+#taglabel .Label {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: var(--dim) !important;
+    border: 1px solid var(--line) !important;
+}
+
+nav.SideNav .Label { margin-left: 4px; }
 .notFind { color: var(--dim) !important; }
 
 /* ---------------- 兜底与响应式 ---------------- */
