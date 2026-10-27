@@ -279,6 +279,9 @@
         }
     });
 
+    /* 兜底：动画被浏览器节流/跳过时，强制展示终态，避免内容长留不可见 */
+    setTimeout(function () { document.body.classList.add("anim-done"); }, 1400);
+
     document.getElementById("heroBrowse").addEventListener("click", function () {
         app.scrollIntoView({ behavior: "smooth", block: "start" });
         setTimeout(function () { searchEl.focus({ preventScroll: true }); }, 420);
