@@ -662,7 +662,8 @@ nav.SideNav a.SideNav-item {
 nav.SideNav a.SideNav-item:last-child { border-bottom: none !important; }
 nav.SideNav a.SideNav-item:hover { background: rgba(42, 212, 255, 0.07); }
 .listTitle { font-size: 15px; }
-.listLabels .Label { margin-left: 4px; }
+.listLabels .Label { margin-left: 4px; filter: saturate(0.55) brightness(0.92); }
+.subnav-search input.form-control::placeholder { color: var(--fg-faint); }
 .notFind { color: var(--fg-dim) !important; }
 
 /* ---------------- 文章页 ---------------- */
@@ -840,6 +841,7 @@ h1.postTitle {
     .hero-scroll { display: none; }
     .toolbar { top: 62px; }
     .wiki-grid { grid-template-columns: 1fr; gap: 16px; }
+    .postMeta { display: none; }
     h1.postTitle { font-size: 30px !important; }
     .md-body { font-size: 16.5px !important; }
 }

@@ -18,6 +18,9 @@
     var base = siteBase();
     var postBody = qs("#postBody");
 
+    var tagSearch = qs(".subnav-search-input");
+    if (tagSearch && !tagSearch.placeholder) tagSearch.placeholder = "搜索标签或标题";
+
     if (!postBody) return;
 
     postBody.classList.add("md-body");
