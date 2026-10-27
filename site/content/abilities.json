@@ -1,0 +1,62 @@
+[
+  {
+    "name": "静电",
+    "en": "Static",
+    "generation": 3,
+    "effect": "受到接触类招式攻击时，有 30% 概率让对手麻痹。"
+  },
+  {
+    "name": "避雷针",
+    "en": "Lightning Rod",
+    "generation": 3,
+    "effect": "吸引电属性招式，并将其转化为自身特攻提升。"
+  },
+  {
+    "name": "茂盛",
+    "en": "Overgrow",
+    "generation": 3,
+    "effect": "HP 低于 1/3 时，草属性招式威力提升 50%。"
+  },
+  {
+    "name": "猛火",
+    "en": "Blaze",
+    "generation": 3,
+    "effect": "HP 低于 1/3 时，火属性招式威力提升 50%。"
+  },
+  {
+    "name": "激流",
+    "en": "Torrent",
+    "generation": 3,
+    "effect": "HP 低于 1/3 时，水属性招式威力提升 50%。"
+  },
+  {
+    "name": "逃跑",
+    "en": "Run Away",
+    "generation": 3,
+    "effect": "面对野生宝可梦时必定能逃走。"
+  },
+  {
+    "name": "适应力",
+    "en": "Adaptability",
+    "generation": 4,
+    "effect": "与自身属性一致的招式，威力加成从 1.5 倍提升到 2 倍。"
+  },
+  {
+    "name": "诅咒之躯",
+    "en": "Cursed Body",
+    "generation": 5,
+    "effect": "受到攻击时，有 30% 概率让对手的招式陷入无法使用状态。"
+  },
+  {
+    "name": "精神力",
+    "en": "Inner Focus",
+    "generation": 3,
+    "effect": "不会因对手的攻击而畏缩。"
+  },
+  {
+    "name": "不屈之心",
+    "en": "Steadfast",
+    "generation": 4,
+    "effect": "每次畏缩时速度提升 1 级。"
+  }
+]

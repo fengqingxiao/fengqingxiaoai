@@ -1,0 +1,72 @@
+[
+  {
+    "name": "精灵球",
+    "en": "Poké Ball",
+    "category": "球",
+    "effect": "用于捕捉野生宝可梦的基础球。",
+    "where": "各地商店"
+  },
+  {
+    "name": "超级球",
+    "en": "Great Ball",
+    "category": "球",
+    "effect": "捕捉率高于精灵球。",
+    "where": "各地商店"
+  },
+  {
+    "name": "高级球",
+    "en": "Ultra Ball",
+    "category": "球",
+    "effect": "捕捉率进一步提升。",
+    "where": "中后期商店"
+  },
+  {
+    "name": "大师球",
+    "en": "Master Ball",
+    "category": "球",
+    "effect": "必定捕获野生宝可梦。",
+    "where": "剧情获得"
+  },
+  {
+    "name": "伤药",
+    "en": "Potion",
+    "category": "回复",
+    "effect": "回复 20 点 HP。",
+    "where": "各地商店"
+  },
+  {
+    "name": "全复药",
+    "en": "Full Restore",
+    "category": "回复",
+    "effect": "完全回复 HP 并治愈异常状态。",
+    "where": "后期商店"
+  },
+  {
+    "name": "雷之石",
+    "en": "Thunder Stone",
+    "category": "进化石",
+    "effect": "让特定宝可梦进化，如皮卡丘。",
+    "where": "商店／野外"
+  },
+  {
+    "name": "火之石",
+    "en": "Fire Stone",
+    "category": "进化石",
+    "effect": "让特定宝可梦进化，如六尾。",
+    "where": "商店／野外"
+  },
+  {
+    "name": "橙橙果",
+    "en": "Oran Berry",
+    "category": "树果",
+    "effect": "携带后 HP 较低时回复 10 点。",
+    "where": "树果田"
+  },
+  {
+    "name": "学习装置",
+    "en": "Exp. Share",
+    "category": "对战",
+    "effect": "让未参战宝可梦也获得经验值。",
+    "where": "剧情获得"
+  }
+]

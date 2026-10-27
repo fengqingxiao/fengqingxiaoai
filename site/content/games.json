@@ -1,0 +1,74 @@
+[
+  {
+    "generation": 1,
+    "title": "宝可梦 红／绿",
+    "en": "Pokémon Red / Green",
+    "platform": "Game Boy",
+    "release": "1996",
+    "desc": "系列原点，关都地区与 151 只宝可梦。"
+  },
+  {
+    "generation": 2,
+    "title": "宝可梦 金／银",
+    "en": "Pokémon Gold / Silver",
+    "platform": "Game Boy Color",
+    "release": "1999",
+    "desc": "引入昼夜、孵蛋与城都地区。"
+  },
+  {
+    "generation": 3,
+    "title": "宝可梦 红宝石／蓝宝石",
+    "en": "Pokémon Ruby / Sapphire",
+    "platform": "Game Boy Advance",
+    "release": "2002",
+    "desc": "丰缘地区，加入特性与性格系统。"
+  },
+  {
+    "generation": 4,
+    "title": "宝可梦 钻石／珍珠",
+    "en": "Pokémon Diamond / Pearl",
+    "platform": "Nintendo DS",
+    "release": "2006",
+    "desc": "神奥地区，物理／特殊分家。"
+  },
+  {
+    "generation": 5,
+    "title": "宝可梦 黑／白",
+    "en": "Pokémon Black / White",
+    "platform": "Nintendo DS",
+    "release": "2010",
+    "desc": "合众地区，强调全新宝可梦阵容。"
+  },
+  {
+    "generation": 6,
+    "title": "宝可梦 X／Y",
+    "en": "Pokémon X / Y",
+    "platform": "Nintendo 3DS",
+    "release": "2013",
+    "desc": "卡洛斯地区，引入妖精属性与超级进化。"
+  },
+  {
+    "generation": 7,
+    "title": "宝可梦 太阳／月亮",
+    "en": "Pokémon Sun / Moon",
+    "platform": "Nintendo 3DS",
+    "release": "2016",
+    "desc": "阿罗拉地区，以岛屿试炼取代道馆。"
+  },
+  {
+    "generation": 8,
+    "title": "宝可梦 剑／盾",
+    "en": "Pokémon Sword / Shield",
+    "platform": "Nintendo Switch",
+    "release": "2019",
+    "desc": "伽勒尔地区，旷野地带与极巨化。"
+  },
+  {
+    "generation": 9,
+    "title": "宝可梦 朱／紫",
+    "en": "Pokémon Scarlet / Violet",
+    "platform": "Nintendo Switch",
+    "release": "2022",
+    "desc": "帕底亚地区，开放世界与太晶化。"
+  }
+]

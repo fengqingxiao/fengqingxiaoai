@@ -1,0 +1,122 @@
+[
+  {
+    "name": "十万伏特",
+    "en": "Thunderbolt",
+    "type": "电",
+    "category": "特殊",
+    "power": 90,
+    "accuracy": 100,
+    "pp": 15,
+    "desc": "有时会让对手麻痹。"
+  },
+  {
+    "name": "打雷",
+    "en": "Thunder",
+    "type": "电",
+    "category": "特殊",
+    "power": 110,
+    "accuracy": 70,
+    "pp": 10,
+    "desc": "雨天必中，命中率偏低。"
+  },
+  {
+    "name": "电光一闪",
+    "en": "Quick Attack",
+    "type": "一般",
+    "category": "物理",
+    "power": 40,
+    "accuracy": 100,
+    "pp": 30,
+    "desc": "必定先制攻击。"
+  },
+  {
+    "name": "喷射火焰",
+    "en": "Flamethrower",
+    "type": "火",
+    "category": "特殊",
+    "power": 90,
+    "accuracy": 100,
+    "pp": 15,
+    "desc": "有时会让对手灼伤。"
+  },
+  {
+    "name": "水枪",
+    "en": "Water Gun",
+    "type": "水",
+    "category": "特殊",
+    "power": 40,
+    "accuracy": 100,
+    "pp": 25,
+    "desc": "最基础的水系攻击。"
+  },
+  {
+    "name": "藤鞭",
+    "en": "Vine Whip",
+    "type": "草",
+    "category": "物理",
+    "power": 45,
+    "accuracy": 100,
+    "pp": 25,
+    "desc": "用藤蔓抽打对手。"
+  },
+  {
+    "name": "冰冻光束",
+    "en": "Ice Beam",
+    "type": "冰",
+    "category": "特殊",
+    "power": 90,
+    "accuracy": 100,
+    "pp": 10,
+    "desc": "有时会冰冻对手。"
+  },
+  {
+    "name": "地震",
+    "en": "Earthquake",
+    "type": "地面",
+    "category": "物理",
+    "power": 100,
+    "accuracy": 100,
+    "pp": 10,
+    "desc": "攻击周围所有宝可梦。"
+  },
+  {
+    "name": "影子球",
+    "en": "Shadow Ball",
+    "type": "幽灵",
+    "category": "特殊",
+    "power": 80,
+    "accuracy": 100,
+    "pp": 15,
+    "desc": "有时会降低对手特防。"
+  },
+  {
+    "name": "龙之爪",
+    "en": "Dragon Claw",
+    "type": "龙",
+    "category": "物理",
+    "power": 80,
+    "accuracy": 100,
+    "pp": 15,
+    "desc": "用锐利的爪子劈开对手。"
+  },
+  {
+    "name": "近身战",
+    "en": "Close Combat",
+    "type": "格斗",
+    "category": "物理",
+    "power": 120,
+    "accuracy": 100,
+    "pp": 5,
+    "desc": "使用后自身防御与特防下降。"
+  },
+  {
+    "name": "剧毒",
+    "en": "Toxic",
+    "type": "毒",
+    "category": "变化",
+    "power": "—",
+    "accuracy": 90,
+    "pp": 10,
+    "desc": "让对手陷入剧毒状态。"
+  }
+]

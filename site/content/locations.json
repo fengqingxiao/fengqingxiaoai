@@ -1,0 +1,72 @@
+[
+  {
+    "name": "真新镇",
+    "en": "Pallet Town",
+    "region": "关都",
+    "generation": 1,
+    "desc": "故事开始的宁静小镇，大木博士的研究所所在地。"
+  },
+  {
+    "name": "常磐市",
+    "en": "Viridian City",
+    "region": "关都",
+    "generation": 1,
+    "desc": "连接真新镇与常磐森林的城市，设有道馆。"
+  },
+  {
+    "name": "石英高原",
+    "en": "Indigo Plateau",
+    "region": "关都",
+    "generation": 1,
+    "desc": "宝可梦联盟所在地，四天王与冠军的舞台。"
+  },
+  {
+    "name": "若叶镇",
+    "en": "New Bark Town",
+    "region": "城都",
+    "generation": 2,
+    "desc": "城都地区的起点，风向标随风转动的小镇。"
+  },
+  {
+    "name": "未白镇",
+    "en": "Littleroot Town",
+    "region": "丰缘",
+    "generation": 3,
+    "desc": "丰缘地区的起点，研究所与主角新家所在。"
+  },
+  {
+    "name": "双叶镇",
+    "en": "Twinleaf Town",
+    "region": "神奥",
+    "generation": 4,
+    "desc": "神奥地区的起点，湖畔的小镇。"
+  },
+  {
+    "name": "鹿子镇",
+    "en": "Nuvema Town",
+    "region": "合众",
+    "generation": 5,
+    "desc": "合众地区的起点，贝尔与切连的家乡。"
+  },
+  {
+    "name": "密阿雷市",
+    "en": "Lumiose City",
+    "region": "卡洛斯",
+    "generation": 6,
+    "desc": "以巴黎为原型的巨大都市，中央矗立着棱镜塔。"
+  },
+  {
+    "name": "木杆镇",
+    "en": "Postwick",
+    "region": "伽勒尔",
+    "generation": 8,
+    "desc": "伽勒尔地区的乡村起点，邻近旷野地带。"
+  },
+  {
+    "name": "桌台市",
+    "en": "Mesagoza",
+    "region": "帕底亚",
+    "generation": 9,
+    "desc": "帕底亚最大的城市，橙葡萄学院位于其上。"
+  }
+]

@@ -1,0 +1,327 @@
+[
+  {
+    "id": 1,
+    "name": "妙蛙种子",
+    "en": "Bulbasaur",
+    "types": [
+      "草",
+      "毒"
+    ],
+    "generation": 1,
+    "category": "种子宝可梦",
+    "abilities": [
+      "茂盛"
+    ],
+    "height": 0.7,
+    "weight": 6.9,
+    "gender": "7:1",
+    "catchRate": 45,
+    "exp": 64,
+    "stats": {
+      "hp": 45,
+      "atk": 49,
+      "def": 49,
+      "spa": 65,
+      "spd": 65,
+      "spe": 45
+    },
+    "dex": "出生时背上就带着种子，会随着它一起长大。",
+    "evolution": [
+      {
+        "name": "妙蛙种子",
+        "method": "等级 16"
+      },
+      {
+        "name": "妙蛙草",
+        "method": "等级 32"
+      },
+      {
+        "name": "妙蛙花"
+      }
+    ],
+    "trivia": [
+      "初代三个初学者宝可梦之一。"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "小火龙",
+    "en": "Charmander",
+    "types": [
+      "火"
+    ],
+    "generation": 1,
+    "category": "蜥蜴宝可梦",
+    "abilities": [
+      "猛火"
+    ],
+    "height": 0.6,
+    "weight": 8.5,
+    "gender": "7:1",
+    "catchRate": 45,
+    "exp": 62,
+    "stats": {
+      "hp": 39,
+      "atk": 52,
+      "def": 43,
+      "spa": 60,
+      "spd": 50,
+      "spe": 65
+    },
+    "dex": "尾巴上的火焰代表它生命力的强弱。",
+    "evolution": [
+      {
+        "name": "小火龙",
+        "method": "等级 16"
+      },
+      {
+        "name": "火恐龙",
+        "method": "等级 36"
+      },
+      {
+        "name": "喷火龙"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "杰尼龟",
+    "en": "Squirtle",
+    "types": [
+      "水"
+    ],
+    "generation": 1,
+    "category": "小龟宝可梦",
+    "abilities": [
+      "激流"
+    ],
+    "height": 0.5,
+    "weight": 9.0,
+    "gender": "7:1",
+    "catchRate": 45,
+    "exp": 63,
+    "stats": {
+      "hp": 44,
+      "atk": 48,
+      "def": 65,
+      "spa": 50,
+      "spd": 64,
+      "spe": 43
+    },
+    "dex": "受惊时会缩进龟壳，再喷出水柱反击。",
+    "evolution": [
+      {
+        "name": "杰尼龟",
+        "method": "等级 16"
+      },
+      {
+        "name": "卡咪龟",
+        "method": "等级 36"
+      },
+      {
+        "name": "水箭龟"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "皮卡丘",
+    "en": "Pikachu",
+    "types": [
+      "电"
+    ],
+    "generation": 1,
+    "category": "鼠宝可梦",
+    "abilities": [
+      "静电",
+      "避雷针"
+    ],
+    "height": 0.4,
+    "weight": 6.0,
+    "gender": "1:1",
+    "catchRate": 190,
+    "exp": 112,
+    "stats": {
+      "hp": 35,
+      "atk": 55,
+      "def": 40,
+      "spa": 50,
+      "spd": 50,
+      "spe": 90
+    },
+    "dex": "脸颊两侧的电囊会储存电力，情绪激动时就会放电。",
+    "evolution": [
+      {
+        "name": "皮丘",
+        "method": "亲密度"
+      },
+      {
+        "name": "皮卡丘",
+        "method": "雷之石"
+      },
+      {
+        "name": "雷丘"
+      }
+    ],
+    "trivia": [
+      "系列代表作之一，长期作为动画主角搭档。"
+    ]
+  },
+  {
+    "id": 94,
+    "name": "耿鬼",
+    "en": "Gengar",
+    "types": [
+      "幽灵",
+      "毒"
+    ],
+    "generation": 1,
+    "category": "影子宝可梦",
+    "abilities": [
+      "诅咒之躯"
+    ],
+    "height": 1.5,
+    "weight": 40.5,
+    "gender": "1:1",
+    "catchRate": 45,
+    "exp": 225,
+    "stats": {
+      "hp": 60,
+      "atk": 65,
+      "def": 60,
+      "spa": 130,
+      "spd": 75,
+      "spe": 110
+    },
+    "dex": "会藏在阴影里，悄悄降低周围人的体温。",
+    "evolution": [
+      {
+        "name": "鬼斯",
+        "method": "等级 25"
+      },
+      {
+        "name": "鬼斯通",
+        "method": "交换"
+      },
+      {
+        "name": "耿鬼"
+      }
+    ]
+  },
+  {
+    "id": 133,
+    "name": "伊布",
+    "en": "Eevee",
+    "types": [
+      "一般"
+    ],
+    "generation": 1,
+    "category": "进化宝可梦",
+    "abilities": [
+      "逃跑",
+      "适应力"
+    ],
+    "height": 0.3,
+    "weight": 6.5,
+    "gender": "7:1",
+    "catchRate": 45,
+    "exp": 65,
+    "stats": {
+      "hp": 55,
+      "atk": 55,
+      "def": 50,
+      "spa": 45,
+      "spd": 65,
+      "spe": 55
+    },
+    "dex": "基因不稳定，会随环境与道具进化成不同模样。",
+    "evolution": [
+      {
+        "name": "伊布",
+        "method": "多种道具"
+      },
+      {
+        "name": "水伊布／雷伊布／火伊布等"
+      }
+    ]
+  },
+  {
+    "id": 149,
+    "name": "快龙",
+    "en": "Dragonite",
+    "types": [
+      "龙",
+      "飞行"
+    ],
+    "generation": 1,
+    "category": "龙宝可梦",
+    "abilities": [
+      "精神力"
+    ],
+    "height": 2.2,
+    "weight": 210.0,
+    "gender": "1:1",
+    "catchRate": 45,
+    "exp": 270,
+    "stats": {
+      "hp": 91,
+      "atk": 134,
+      "def": 95,
+      "spa": 100,
+      "spd": 100,
+      "spe": 80
+    },
+    "dex": "据说能在十六小时内绕地球一周，是海上的守护者。",
+    "evolution": [
+      {
+        "name": "迷你龙",
+        "method": "等级 30"
+      },
+      {
+        "name": "哈克龙",
+        "method": "等级 55"
+      },
+      {
+        "name": "快龙"
+      }
+    ]
+  },
+  {
+    "id": 448,
+    "name": "路卡利欧",
+    "en": "Lucario",
+    "types": [
+      "格斗",
+      "钢"
+    ],
+    "generation": 4,
+    "category": "波导宝可梦",
+    "abilities": [
+      "不屈之心",
+      "精神力"
+    ],
+    "height": 1.2,
+    "weight": 54.0,
+    "gender": "7:1",
+    "catchRate": 45,
+    "exp": 184,
+    "stats": {
+      "hp": 70,
+      "atk": 110,
+      "def": 70,
+      "spa": 115,
+      "spd": 70,
+      "spe": 90
+    },
+    "dex": "能感知被称为波导的生命能量，读懂对手的情绪与动作。",
+    "evolution": [
+      {
+        "name": "利欧路",
+        "method": "白天亲密度"
+      },
+      {
+        "name": "路卡利欧"
+      }
+    ]
+  }
+]
